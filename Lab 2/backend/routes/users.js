@@ -11,115 +11,35 @@ const uri =
 app.post("/login", function(req, res) {
   console.log("Inside login POST");
   console.log("Request Body: ", req.body);
-
-  // const hashedPassword = bcrypt.hashSync(req.body.Password, 10);
-  // console.log(hashedPassword);
-
   //Query
+  if (req.body.Profile === "Buyer") {
+    MongoClient.connect(uri, { useUnifiedTopology: true }, function(
+      err,
+      client
+    ) {
+      if (err) {
+        console.log(
+          "Error occurred while connecting to MongoDB Atlas...\n",
+          err
+        );
+      } else {
+        console.log("Connected to DB Success");
 
-  MongoClient.connect(uri, { useUnifiedTopology: true }, function(err, client) {
-    if (err) {
-      console.log("Error occurred while connecting to MongoDB Atlas...\n", err);
-    } else {
-      console.log("Connected to DB Success");
+        var collection = client.db("grubhub").collection("buyer");
+        var query = { email: req.body.Email };
 
-      //if (req.body.Profile === "Buyer") {
-      var collection = client.db("grubhub").collection("buyer");
-      var query = { email: req.body.Email };
-      //console.log("Buyer Collection");
-      // } else {
-      //   var collection = client.db("grubhub").collection("owner");
-      //   var query = { owner_id: req.body.Email };
-      // }
-
-      collection.findOne(query, function(err, result) {
-        if (err) {
-          console.log("Invalid Credentials!!");
-        }
-        if (!result) {
-          console.log("Not Found!");
-        }
-        if (!bcrypt.compareSync(req.body.Password, result.password)) {
-          console.log("Invalid Password!");
-
-          if (req.body.Profile === "Buyer") {
-            console.log(result);
-            res.cookie("cookie", result.name, {
-              maxAge: 360000,
-              httpOnly: false,
-              path: "/"
-            });
-            res.cookie("buyer", 1, {
-              maxAge: 360000,
-              httpOnly: false,
-              path: "/"
-            });
-            req.session.user = result;
-            res.writeHead(200, {
-              "Content-type": "text/plain"
-            });
-            console.log("Login successful!");
-            res.end("Login successful!");
-          } else {
-            console.log(result);
-            res.cookie("cookie", result.name, {
-              maxAge: 360000,
-              httpOnly: false,
-              path: "/"
-            });
-            //res.cookie("accounttype", result[0].accounttype, {
-            res.cookie("owner", 2, {
-              maxAge: 360000,
-              httpOnly: false,
-              path: "/"
-            });
-            req.session.user = result;
-            res.writeHead(200, {
-              "Content-type": "text/plain"
-            });
-            console.log("Login successful!");
-            res.end("Login successful!");
-          }
-        }
-      });
-
-      client.close();
-    }
-  });
-});
-
-/*  pool.getConnection(function(err, conn) {
-    if (err) {
-      console.log("Error in creating connection!");
-      res.writeHead(400, {
-        "Content-type": "text/plain"
-      });
-      res.end("Error in creating connection!");
-    } else {
-      if (req.body.Profile === "Buyer") {
-        //Login validation query
-        var sql =
-          "SELECT * from buyer WHERE email = " + mysql.escape(req.body.Email);
-        conn.query(sql, function(err, result) {
+        collection.findOne(query, function(err, result) {
           if (err) {
-            res.writeHead(400, {
-              "Content-Type": "text/plain"
-            });
-            res.end("Invalid Credentials!");
-          } else {
-            //compare hashed passwords
-            if (
-              result.length == 0 ||
-              !bcrypt.compareSync(req.body.Password, result[0].password)
-            ) {
-              res.writeHead(401, {
-                message: "Invalid Credentials"
-              });
-              console.log("Invalid Credentials!");
-              res.end("Invalid Credentials!");
+            console.log("Invalid Credentials!!");
+          }
+          if (result) {
+            console.log("User Details", result);
+
+            if (!bcrypt.compareSync(req.body.Password, result.password)) {
+              console.log("Invalid Password!");
             } else {
               console.log(result);
-              res.cookie("cookie", result[0].name, {
+              res.cookie("cookie", result.name, {
                 maxAge: 360000,
                 httpOnly: false,
                 path: "/"
@@ -129,7 +49,7 @@ app.post("/login", function(req, res) {
                 httpOnly: false,
                 path: "/"
               });
-              req.session.user = result[0];
+              req.session.user = result;
               res.writeHead(200, {
                 "Content-type": "text/plain"
               });
@@ -138,39 +58,48 @@ app.post("/login", function(req, res) {
             }
           }
         });
+        client.close();
+      }
+    });
+  } else {
+    MongoClient.connect(uri, { useUnifiedTopology: true }, function(
+      err,
+      client
+    ) {
+      if (err) {
+        console.log(
+          "Error occurred while connecting to MongoDB Atlas...\n",
+          err
+        );
       } else {
-        var sql =
-          "SELECT * from owner WHERE email = " + mysql.escape(req.body.Email);
-        conn.query(sql, function(err, result) {
+        console.log("Connected to DB Success");
+
+        var collection = client.db("grubhub").collection("owner");
+        var query = { email: req.body.Email };
+
+        collection.findOne(query, function(err, result) {
           if (err) {
-            res.writeHead(400, {
-              "Content-Type": "text/plain"
-            });
-            res.end("Invalid Credentials!");
-          } else {
-            if (
-              result.length == 0 ||
-              !bcrypt.compareSync(req.body.Password, result[0].password)
-            ) {
-              res.writeHead(401, {
-                "Content-type": "text/plain"
-              });
-              console.log("Invalid Credentials!");
-              res.end("Invalid Credentials!");
+            console.log("Invalid Credentials!!");
+          }
+          if (result) {
+            console.log("User Details", result);
+
+            if (!bcrypt.compareSync(req.body.Password, result.password)) {
+              console.log("Invalid Password!");
             } else {
               console.log(result);
-              res.cookie("cookie", result[0].name, {
+              res.cookie("cookie", result.name, {
                 maxAge: 360000,
                 httpOnly: false,
                 path: "/"
               });
-              //res.cookie("accounttype", result[0].accounttype, {
+
               res.cookie("owner", 2, {
                 maxAge: 360000,
                 httpOnly: false,
                 path: "/"
               });
-              req.session.user = result[0];
+              req.session.user = result;
               res.writeHead(200, {
                 "Content-type": "text/plain"
               });
@@ -179,10 +108,11 @@ app.post("/login", function(req, res) {
             }
           }
         });
+        client.close();
       }
-    }
-  });
-});*/
+    });
+  }
+});
 
 app.post("/signup", function(req, res) {
   console.log("Inside Signup POST");
@@ -282,11 +212,18 @@ app.post("/ownersignup", function(req, res) {
       collection.insertOne(owner, function(err, result) {
         if (err) {
           console.log("Error in adding owner");
+          res.writeHead(400, {
+            "Content-Type": "text/plain"
+          });
+          res.end("Error in adding Owner");
         } else {
-          console.log("Added owner successfully");
+          console.log("Adding a owner successful!");
+          res.writeHead(200, {
+            "Content-type": "text/plain"
+          });
+          res.end("Adding a user successful!");
         }
       });
-
       client.close();
     }
   });
@@ -344,99 +281,50 @@ app.post("/update-profile", function(req, res) {
   console.log("Req Session:", req.session.user.accounttype);
   console.log("Email:", req.session.user.email);
 
-  if (req.session.user) {
-    pool.getConnection(function(err, conn) {
-      if (err) {
-        console.log("Error in creating connection!");
-        res.writeHead(400, {
-          "Content-type": "text/plain"
-        });
-        res.end("Error in creating connection!");
+  MongoClient.connect(uri, { useUnifiedTopology: true }, function(err, client) {
+    if (err) {
+      console.log("Error occurred while connecting to MongoDB Atlas...\n", err);
+    } else {
+      console.log("Connected to DB Success");
+
+      if (req.session.user.accounttype === 1) {
+        var collection = client.db("grubhub").collection("buyer");
       } else {
-        if (
-          req.session.user.accounttype === 1 ||
-          req.session.user.accounttype === 3
-        ) {
-          var sql =
-            "UPDATE buyer set " +
-            "name = " +
-            mysql.escape(req.body.name) +
-            "," +
-            "email = " +
-            mysql.escape(req.body.email) +
-            "," +
-            "phone = " +
-            mysql.escape(req.body.phone) +
-            "," +
-            "aboutme= " +
-            mysql.escape(req.body.aboutme) +
-            "," +
-            "country = " +
-            mysql.escape(req.body.country) +
-            "," +
-            "city = " +
-            mysql.escape(req.body.city) +
-            "," +
-            "gender = " +
-            mysql.escape(req.body.gender) +
-            "," +
-            "company = " +
-            mysql.escape(req.body.company) +
-            "," +
-            "profileimage = " +
-            mysql.escape(req.body.profileimage) +
-            " WHERE email = " +
-            req.session.user.email;
-        } else {
-          var sql =
-            "UPDATE owner set " +
-            "name = " +
-            mysql.escape(req.body.name) +
-            "," +
-            "email = " +
-            mysql.escape(req.body.email) +
-            "," +
-            "phone = " +
-            mysql.escape(req.body.phone) +
-            "," +
-            "aboutme= " +
-            mysql.escape(req.body.aboutme) +
-            "," +
-            "country = " +
-            mysql.escape(req.body.country) +
-            "," +
-            "city = " +
-            mysql.escape(req.body.city) +
-            "," +
-            "gender = " +
-            mysql.escape(req.body.gender) +
-            "," +
-            "company = " +
-            mysql.escape(req.body.company) +
-            "," +
-            "ProfileImage = " +
-            mysql.escape(req.body.profileimage) +
-            " WHERE owner_id = " +
-            req.session.user.owner_id;
-        }
-        conn.query(sql, function(err, result) {
-          if (err) {
-            console.log("Error in updating profile data");
-            res.writeHead(400, {
-              "Content-type": "text/plain"
-            });
-            res.end("Error in updating profile data");
-          } else {
-            console.log("Profile data update complete!");
-            res.writeHead(200, {
-              "Content-type": "text/plain"
-            });
-            res.end("Profile data update complete!");
-          }
-        });
+        var collection = client.db("grubhub").collection("owner");
       }
-    });
-  }
+
+      var query = { email: req.session.user.email };
+      console.log("Query", query);
+      var newquery = {
+        $set: {
+          name: req.body.name,
+          email: req.body.email,
+          phone: req.body.phone,
+          aboutme: req.body.aboutme,
+          country: req.body.country,
+          city: req.body.city,
+          gender: req.body.gender,
+          company: req.body.company,
+          profileimage: req.body.profileimage
+        }
+      };
+
+      console.log("NewQuery:", newquery);
+
+      collection.updateOne(query, newquery, function(err, result) {
+        if (err) {
+          console.log("Error in updating profile");
+        } else {
+          console.log("Updating profile successful!");
+          res.writeHead(200, {
+            "Content-type": "text/plain"
+          });
+          res.end("Updating profile successful!");
+        }
+      });
+      client.close();
+    }
+  });
 });
 
 app.post("/logout", function(req, res) {
