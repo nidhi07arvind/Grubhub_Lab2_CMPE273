@@ -11,10 +11,15 @@ var buyerRouter = require("./routes/buyers");
 
 var app = express();
 
+var mongoUtil = require("./Database");
+const initializeDatabases = require("./dbs");
+
 var bodyParser = require("body-parser");
 var session = require("express-session");
 var cookieParser = require("cookie-parser");
 var cors = require("cors");
+
+var passport = require("passport");
 
 var mysql = require("mysql");
 var MongoClient = require("mongodb").MongoClient;
@@ -55,6 +60,10 @@ app.use(function(req, res, next) {
   res.setHeader("Cache-Control", "no-cache");
   next();
 });
+
+app.use(passport.initialize());
+
+require("./config/passport")(passport);
 
 app.use("/", usersRouter);
 app.use("/", ownerRouter);
