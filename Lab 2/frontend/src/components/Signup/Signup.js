@@ -3,9 +3,13 @@ import axios from "axios";
 import { Redirect } from "react-router";
 import Header from "../Header/Header";
 
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { signup } from "../../actions/LoginActions";
+
 class Signup extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       FirstName: "",
@@ -42,7 +46,18 @@ class Signup extends Component {
   };
 
   signup = e => {
-    if (
+    e.preventDefault();
+
+    const post = {
+      FirstName: this.state.FirstName,
+      Email: this.state.Email,
+      Password: this.state.Password,
+      Accounttype: 1
+    };
+
+    this.props.signup(post);
+  };
+  /*if (
       this.state.FirstName === "" ||
       this.state.Email === "" ||
       this.state.Password === ""
@@ -73,8 +88,8 @@ class Signup extends Component {
           });
         }
       });
-    }
-  };
+    }*/
+  //};
 
   render() {
     let redirectVar = null;
@@ -186,4 +201,11 @@ class Signup extends Component {
   }
 }
 
-export default Signup;
+Signup.propTypes = {
+  signup: PropTypes.func.isRequired
+};
+
+export default connect(
+  null,
+  { signup }
+)(Signup);

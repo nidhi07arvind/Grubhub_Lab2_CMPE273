@@ -1,0 +1,4 @@
+export const SIGNUP = "SIGNUP";
+export const GET_PROFILE_DETAILS = "GET_PROFILE_DETAILS";
+export const UPDATE_PROFILE_DETAILS = "UPDATE_PROFILE_DETAILS";
+//export const NEW_POSTS = "NEW_POSTS";

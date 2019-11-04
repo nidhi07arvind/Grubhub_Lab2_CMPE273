@@ -26,8 +26,8 @@ class UpdateItems extends Component {
     var data = {
       item_id: this.props.match.params.id
     };
-    console.log("Data:", data);
-    /*axios.get("http://localhost:3001/update-item").then(response => {
+    console.log("Data Item_ID:", data);
+    axios.post("http://localhost:3001/item-details", data).then(response => {
       if (response.status === 200) {
         console.log(response.data);
         var data = response.data;
@@ -38,7 +38,7 @@ class UpdateItems extends Component {
           section: data.section
         });
       }
-    });*/
+    });
   }
   handleChange = e => {
     const target = e.target;
@@ -53,12 +53,18 @@ class UpdateItems extends Component {
   handleSubmit = e => {
     e.preventDefault();
     axios.defaults.withCredentials = true;
+
+    // var data = {
+    //   item_id: this.props.match.params.id
+    // };
+
     const data = {
-      name: this.state.name,
+      item_id: this.props.match.params.id,
+      item_name: this.state.item_name,
       description: this.state.description,
-      section: this.state.section,
-      price: this.state.price,
-      image: this.state.image
+      //section: this.state.section,
+      price: this.state.price
+      //image: this.state.image
     };
     console.log("Data:", data);
 
@@ -77,6 +83,7 @@ class UpdateItems extends Component {
       }
     });
   };
+
   render() {
     let redirectVar = null;
     if (!cookie.load("cookie")) {

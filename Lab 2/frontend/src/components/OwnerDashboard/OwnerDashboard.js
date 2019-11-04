@@ -16,8 +16,7 @@ class OwnerDashboard extends Component {
       isLunch: false
     };
     this.saveChanges = this.saveChanges.bind(this);
-    //this.handleChange = this.handleChange.bind(this);
-    //this.handleSubmit = this.handleSubmit.bind(this);
+    this.submitChanges = this.submitChanges.bind(this);
   }
 
   componentWillMount() {
@@ -31,38 +30,6 @@ class OwnerDashboard extends Component {
           this.setState({
             items: response.data
           });
-
-          // var itemDetails = [];
-          // for (let i = 0; i < this.state.items.length; i++) {
-          //   var data = {
-          //     item_id: this.state.items[i].item_id
-          //   };
-
-          // axios
-          //   .post("http://localhost:3001/item-details", data)
-          //   .then(response => {
-          //     if (response.status === 200) {
-          //       var itemDetail = response.data;
-          //       itemDetail["item_id"] = this.state.items[i].item_id;
-          //       itemDetail["res_id"] = this.state.items[i].res_id;
-          //       itemDetail["item_name"] = this.state.items[i].item_name;
-          //       itemDetail["description"] = this.state.items[i].description;
-          //       itemDetail["price"] = this.state.items[i].price;
-          //       itemDetails.push(itemDetail);
-          //       this.setState({
-          //         itemDetails: itemDetails
-          //       });
-          //       console.log("Item Details: ", this.state.itemDetails);
-          //     }
-          //   })
-          // .catch(err => {
-          //   if (err) {
-          //     this.setState({
-          //       errorRedirect: true
-          //     });
-          //   }
-          // });
-          //}
         }
       })
       .catch(err => {
@@ -83,6 +50,29 @@ class OwnerDashboard extends Component {
 
     axios
       .post("http://localhost:3001/delete-item", data)
+      .then(response => {
+        if (response.status === 200) {
+          console.log(response.data);
+        }
+      })
+      .catch(err => {
+        if (err) {
+          this.setState({
+            errorRedirect: true
+          });
+        }
+      });
+  };
+
+  submitChanges = item => e => {
+    console.log(item);
+
+    const data = item;
+
+    axios.defaults.withCredentials = true;
+
+    axios
+      .post("http://localhost:3001/update-item", data)
       .then(response => {
         if (response.status === 200) {
           console.log(response.data);

@@ -25,6 +25,7 @@ class Header extends Component {
     let loggedInUserContent = null;
     let ownerTab = null;
     let buyerTab = null;
+    let buyerTab1 = null;
 
     if (cookie.load("owner")) {
       ownerTab = (
@@ -42,6 +43,11 @@ class Header extends Component {
           <span>
             <a href="/owner-order-details" className="btn btn-sm lyp-btn">
               Orders
+            </a>
+          </span>
+          <span>
+            <a href="/add-items" className="btn btn-sm lyp-btn">
+              Chats
             </a>
           </span>
 
@@ -84,6 +90,16 @@ class Header extends Component {
       );
     }
 
+    if (cookie.load("buyer")) {
+      buyerTab1 = (
+        <span>
+          <a href="/get-chats" className="btn btn-sm lyp-btn">
+            Chat
+          </a>
+        </span>
+      );
+    }
+
     let username = cookie.load("cookie");
     if (cookie.load("cookie")) {
       loggedInUserContent = (
@@ -93,6 +109,7 @@ class Header extends Component {
           </a>
           {ownerTab}
           {buyerTab}
+          {buyerTab1}
           <span>
             <a>Welcome! {username}</a>
 
