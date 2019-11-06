@@ -5,6 +5,7 @@ import { Redirect } from "react-router";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.css";
+import { rooturl } from "../../config/settings";
 
 class BuyerOrder extends Component {
   constructor() {
@@ -16,13 +17,14 @@ class BuyerOrder extends Component {
       isLunch: false
     };
     this.saveChanges = this.saveChanges.bind(this);
+    this.saveChat = this.saveChat.bind(this);
   }
 
   componentWillMount() {
     axios.defaults.withCredentials = true;
 
     axios
-      .get("http://localhost:3001/buyer-order")
+      .get(`${rooturl}/buyer-order`)
       .then(response => {
         if (response.status === 200) {
           console.log("Response : ", response.data);
@@ -48,7 +50,7 @@ class BuyerOrder extends Component {
     axios.defaults.withCredentials = true;
 
     axios
-      .post("http://localhost:3001/delete-item", data)
+      .post(`${rooturl}/delete-item`, data)
       .then(response => {
         if (response.status === 200) {
           console.log(response.data);
@@ -63,6 +65,28 @@ class BuyerOrder extends Component {
       });
   };
 
+  saveChat = item => e => {
+    console.log(item);
+
+    const data = item;
+
+    axios.defaults.withCredentials = true;
+
+    axios
+      .get(`${rooturl}/get-chats`)
+      .then(response => {
+        if (response.status === 200) {
+          console.log(response.data);
+        }
+      })
+      .catch(err => {
+        if (err) {
+          this.setState({
+            errorRedirect: true
+          });
+        }
+      });
+  };
   render() {
     let redrirectVar = null;
     if (!cookie.load("cookie")) {
@@ -72,6 +96,7 @@ class BuyerOrder extends Component {
       redrirectVar = <Redirect to="/error" />;
     }
     console.log(this.state.items);
+
     let itemDetails = this.state.items.map(function(item, index) {
       return (
         <div className="container trip-details-container" key={index}>
@@ -88,6 +113,12 @@ class BuyerOrder extends Component {
               >
                 Delete Order
               </button>
+              <br></br>
+              <br></br>
+              <button className="btn btn-danger" onClick={this.saveChat(item)}>
+                Chat
+              </button>
+              <Link to={"/get-chats/" + item.order_id}>Get Chat</Link>
             </div>
           </div>
         </div>

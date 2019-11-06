@@ -4,7 +4,8 @@ import { Redirect } from "react-router";
 import Header from "../Header/Header";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
-import { runInThisContext } from "vm";
+import { rooturl } from "../../config/settings";
+import { Link } from "react-router-dom";
 
 class OwnerOrders extends Component {
   constructor() {
@@ -44,7 +45,7 @@ class OwnerOrders extends Component {
     const { data } = this.state.items[0].order_id;
 
     axios
-      .post("http://localhost:3001/update-owner-order", this.state.items)
+      .post(`${rooturl}/update-owner-order`, this.state.items)
       .then(response => {
         if (response === 200) {
           console.log("Order Updated");
@@ -61,7 +62,7 @@ class OwnerOrders extends Component {
   componentDidMount() {
     axios.defaults.withCredentials = true;
     axios
-      .get("http://localhost:3001/owner-order-details")
+      .get(`${rooturl}/owner-order-details`)
       .then(response => {
         if (response.status === 200) {
           console.log("Response:", response.data);
@@ -117,6 +118,7 @@ class OwnerOrders extends Component {
                   }}
                 ></input>
               </div>
+              <Link to={"/get-chats/" + item.order_id}>Get Chat</Link>
             </div>
           </div>
         </div>

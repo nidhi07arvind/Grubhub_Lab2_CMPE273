@@ -8,7 +8,6 @@ import Home from "./Home/Home";
 import Signup from "./Signup/Signup";
 
 import OwnerSignup from "./Signup/OwnerSignup";
-import AddRestaurant from "./ListRestaurant/AddRestaurant";
 import DisplayItems from "./DisplayItems/DisplayItems";
 import RestaurantDisplay from "./DisplayItems/RestaurantDisplay";
 import CuisineDisplay from "./DisplayItems/CuisineDisplay";
@@ -89,7 +88,6 @@ class Main extends Component {
           <Route path="/login" component={Login} />
           <Route path="/sign-up" component={Signup} />
           <Route path="/owner-sign-up" component={OwnerSignup} />
-          <Route path="/add-property" component={AddRestaurant} />
           <Route
             render={() => {
               return (
@@ -118,7 +116,7 @@ class Main extends Component {
           <Route path="/buyer-order" component={BuyerOrder} />
           <Route path="/past-order" component={PastOrders} />
           <Route path="/cuisine-display/:id" component={CuisineDisplay} />
-          <Route path="/get-chats" component={BuyerChat} />
+          <Route path="/get-chats/:id" component={BuyerChat} />
         </div>
       </Provider>
     );

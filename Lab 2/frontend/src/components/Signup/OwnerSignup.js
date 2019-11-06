@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { Redirect } from "react-router";
 import Header from "../Header/Header";
+import { rooturl } from "../../config/settings";
 
 class OwnerSignup extends Component {
   constructor() {
@@ -84,7 +85,7 @@ class OwnerSignup extends Component {
       axios.defaults.withCredentials = true;
 
       axios
-        .post("http://localhost:3001/ownersignup", data)
+        .post(`${rooturl}/ownersignup`, data)
         .then(response => {
           if (response.status === 200) {
             this.setState({

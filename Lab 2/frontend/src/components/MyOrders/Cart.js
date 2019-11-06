@@ -4,10 +4,15 @@ import cookie from "react-cookies";
 import { Redirect } from "react-router";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
+import { rooturl } from "../../config/settings";
+
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { cartitems } from "../../actions/DashboardActions";
 
 class Cart extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       items: [{ item_id: "", res_id: "", quantity: "" }],
 
@@ -41,7 +46,7 @@ class Cart extends Component {
     const { data } = this.state.items[0].item_id;
 
     axios
-      .post("http://localhost:3001/place-order", this.state.items)
+      .post(`${rooturl}/place-order`, this.state.items)
       .then(response => {
         if (response === 200) {
           console.log("Order placed");
@@ -57,10 +62,11 @@ class Cart extends Component {
   };
 
   componentDidMount() {
+    //this.props.cartitems();
     axios.defaults.withCredentials = true;
 
     axios
-      .get("http://localhost:3001/cart-details")
+      .get(`${rooturl}/cart-details`)
       .then(response => {
         if (response.status === 200) {
           console.log("Response : ", response.data);
@@ -111,13 +117,9 @@ class Cart extends Component {
                 <input
                   type="text"
                   name="quantity"
-                  // value={item.quantity}
-                  onChange={
-                    e => {
-                      this.handleChange(e, item.item_id, item.quantity);
-                    }
-                    // this.handleChange(e, item.item_id, item.quantity
-                  }
+                  onChange={e => {
+                    this.handleChange(e, item.item_id, item.quantity);
+                  }}
                 ></input>
               </div>
               <br></br>
@@ -128,7 +130,6 @@ class Cart extends Component {
         </div>
       );
     }, this);
-    //});
 
     return (
       <div>
@@ -147,5 +148,20 @@ class Cart extends Component {
     );
   }
 }
+
+/*Cart.propTypes = {
+  cartitems: PropTypes.func.isRequired
+};
+
+const mapStateToProps = state => {
+  return {
+    r_items: state.r_items.cart_items
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  { cartitems }
+)(Cart);*/
 
 export default Cart;

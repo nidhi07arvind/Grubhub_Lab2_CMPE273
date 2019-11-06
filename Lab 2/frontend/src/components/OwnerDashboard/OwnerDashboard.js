@@ -5,86 +5,29 @@ import { Redirect } from "react-router";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.css";
+import { rooturl } from "../../config/settings";
+
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { updateitems, deleteitems } from "../../actions/ItemsActions";
+import { dashboarditems } from "../../actions/DashboardActions";
 
 class OwnerDashboard extends Component {
-  constructor() {
-    super();
-    this.state = {
-      items: [],
-      itemDetails: [],
-      errorRedirect: false,
-      isLunch: false
-    };
-    this.saveChanges = this.saveChanges.bind(this);
-    this.submitChanges = this.submitChanges.bind(this);
-  }
-
-  componentWillMount() {
-    axios.defaults.withCredentials = true;
-
-    axios
-      .get("http://localhost:3001/owner-dashboard-details")
-      .then(response => {
-        if (response.status === 200) {
-          console.log("Response : ", response.data);
-          this.setState({
-            items: response.data
-          });
-        }
-      })
-      .catch(err => {
-        if (err) {
-          this.setState({
-            errorRedirect: true
-          });
-        }
-      });
+  componentDidMount() {
+    this.props.dashboarditems();
   }
 
   saveChanges = item => e => {
+    e.preventDefault();
     console.log(item);
-
     const data = item;
-
-    axios.defaults.withCredentials = true;
-
-    axios
-      .post("http://localhost:3001/delete-item", data)
-      .then(response => {
-        if (response.status === 200) {
-          console.log(response.data);
-        }
-      })
-      .catch(err => {
-        if (err) {
-          this.setState({
-            errorRedirect: true
-          });
-        }
-      });
+    this.props.deleteitems(data);
   };
 
   submitChanges = item => e => {
     console.log(item);
-
     const data = item;
-
-    axios.defaults.withCredentials = true;
-
-    axios
-      .post("http://localhost:3001/update-item", data)
-      .then(response => {
-        if (response.status === 200) {
-          console.log(response.data);
-        }
-      })
-      .catch(err => {
-        if (err) {
-          this.setState({
-            errorRedirect: true
-          });
-        }
-      });
+    this.props.updateitems(data);
   };
 
   render() {
@@ -92,11 +35,11 @@ class OwnerDashboard extends Component {
     if (!cookie.load("cookie")) {
       redrirectVar = <Redirect to="/login" />;
     }
-    if (this.state.errorRedirect === true) {
+    if (this.props.errorRedirect === true) {
       redrirectVar = <Redirect to="/error" />;
     }
-    console.log(this.state.items);
-    let itemDetails = this.state.items.map(function(item, index) {
+
+    let itemDetails = this.props.r_items.map(function(item, index) {
       return (
         <div className="container trip-details-container" key={index}>
           <Link to={"/update-item/" + item.item_id}>Update Item</Link>
@@ -138,4 +81,19 @@ class OwnerDashboard extends Component {
   }
 }
 
-export default OwnerDashboard;
+OwnerDashboard.propTypes = {
+  dashboarditems: PropTypes.func.isRequired,
+  r_items: PropTypes.array.isRequired,
+  deleteitems: PropTypes.func.isRequired
+};
+
+const mapStateToProps = state => {
+  return {
+    r_items: state.r_items.items
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  { deleteitems, dashboarditems }
+)(OwnerDashboard);

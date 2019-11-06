@@ -1,14 +1,10 @@
 import React, { Component } from "react";
-//import ReactDOM from "react-router-dom";
 import axios from "axios";
 import cookie, { save } from "react-cookies";
 import { Redirect } from "react-router";
 import Header from "../Header/Header";
-import { Link } from "react-router-dom";
-import DisplayItems from "../DisplayItems/DisplayItems";
-import { isString } from "util";
-import { runInThisContext } from "vm";
 import "bootstrap/dist/css/bootstrap.css";
+import { rooturl } from "../../config/settings";
 
 class CuisineDisplay extends Component {
   constructor() {
@@ -31,7 +27,7 @@ class CuisineDisplay extends Component {
     };
     console.log("Data:", data);
     axios
-      .post("http://localhost:3001/cuisine-display", data)
+      .post(`${rooturl}/cuisine-display`, data)
       .then(response => {
         if (response.status === 200) {
           console.log("All items in cuisine:", response.data);
@@ -57,7 +53,7 @@ class CuisineDisplay extends Component {
     axios.defaults.withCredentials = true;
 
     axios
-      .post("http://localhost:3001/addtocart", data)
+      .post(`${rooturl}/addtocart`, data)
       .then(response => {
         if (response.status === 200) {
           console.log(response.data);

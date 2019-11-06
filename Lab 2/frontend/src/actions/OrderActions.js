@@ -1,22 +1,22 @@
 import { rooturl } from "../config/settings";
-import { SIGNUP } from "./types";
+import { ADD_TO_CART } from "./types";
 import axios from "axios";
 
-export const signup = postData => dispatch => {
-  console.log("signup action called");
+export const addtocart = postData => dispatch => {
+  console.log("addtocart action called");
 
   axios.defaults.withCredentials = true;
   axios
-    .post(`${rooturl}/signup`, postData)
+    .post(`${rooturl}/addtocart`, postData)
     .then(response => {
       console.log("response", response.data);
       if (response.status === 200) {
-        var result = {
-          isNewUserCreated: true
-        };
+        // var result = {
+        //   isSave: true
+        // };
         dispatch({
-          type: SIGNUP,
-          payload: result
+          type: ADD_TO_CART,
+          payload: response.data
         });
       }
     })
@@ -26,7 +26,7 @@ export const signup = postData => dispatch => {
         errorRedirect: true
       };
       dispatch({
-        type: SIGNUP,
+        type: ADD_TO_CART,
         payload: result
       });
     });

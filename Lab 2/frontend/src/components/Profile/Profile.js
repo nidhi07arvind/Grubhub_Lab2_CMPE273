@@ -4,6 +4,7 @@ import { Redirect } from "react-router";
 import Header from "../Header/Header";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
+import { rooturl } from "../../config/settings";
 
 class Profile extends Component {
   constructor() {
@@ -31,7 +32,7 @@ class Profile extends Component {
 
   componentDidMount() {
     axios.defaults.withCredentials = true;
-    axios.get("http://localhost:3001/profile-details").then(response => {
+    axios.get(`${rooturl}/profile-details`).then(response => {
       if (response.status === 200) {
         console.log(response.data);
         var data = response.data;
@@ -124,7 +125,7 @@ class Profile extends Component {
 
     console.log("Data: ", data);
     axios
-      .post("http://localhost:3001/update-profile", data)
+      .post(`${rooturl}/update-profile`, data)
       .then(response => {
         if (response.status === 200) {
           console.log("");

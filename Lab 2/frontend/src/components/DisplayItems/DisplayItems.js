@@ -5,6 +5,7 @@ import { Redirect } from "react-router";
 import Header from "../Header/Header";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.css";
+import { rooturl } from "../../config/settings";
 
 class DisplayItems extends Component {
   constructor(props) {
@@ -15,13 +16,23 @@ class DisplayItems extends Component {
       ItemDetails: [],
       res_id: "",
       isSelected: true,
-      errorRedirect: false
+      errorRedirect: false,
+      currentPage: 1,
+      todosPerPage: 1
     };
 
     //Bind
 
     this.handleChange = this.handleChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
+
+  handleClick(event) {
+    this.setState({
+      currentPage: Number(event.target.id)
+    });
+  }
+
   handleChange = e => {
     const target = e.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
@@ -39,7 +50,7 @@ class DisplayItems extends Component {
 
     axios.defaults.withCredentials = true;
     axios
-      .post("http://localhost:3001/search", data)
+      .post(`${rooturl}/search`, data)
       .then(response => {
         if (response.status === 200) {
           console.log("Response:", response.data);
@@ -92,8 +103,12 @@ class DisplayItems extends Component {
     if (this.state.errorRedirect === true) {
       redirectVar = <Redirect to="/error" />;
     }
-
-    let itemDetails = this.state.Items.map(function(item, index) {
+    const { Items, currentPage, todosPerPage } = this.state;
+    const indexOfLastTodo = currentPage * todosPerPage;
+    const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+    const currentTodos = Items.slice(indexOfFirstTodo, indexOfLastTodo);
+    let itemDetails = currentTodos.map(function(item, index) {
+      //let itemDetails = this.state.Items.map(function(item, index) {
       return (
         <div className="container trip-details-container" key={index}>
           <Link to={"/restaurant-display/" + item.res_id}>
@@ -135,33 +150,36 @@ class DisplayItems extends Component {
       );
     });
 
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(Items.length / todosPerPage); i++) {
+      pageNumbers.push(i);
+    }
+
+    const renderPageNumbers = pageNumbers.map(number => {
+      return (
+        <span
+          //style="color:red;margin-right:1.25em; display:inline-block;"
+          key={number}
+          id={number}
+          onClick={this.handleClick}
+        >
+          {number}
+          <br></br>
+        </span>
+      );
+    });
+
     return (
       <div>
         <Header />
 
         <div className="container">
           {redirectVar}
-          <div className="form-group row search-tab container search-tab-display-property">
-            {/*<span className="col-lg-4 col-md-12 col-sm-12 col-xs-12 pad-bot-10">
-              <input
-                type="textbox"
-                className="form-control form-control-lg"
-                name="searchText"
-                placeholder="Search"
-                onChange={this.props.handleInputChange}
-              ></input>
-            </span>
-            <span className="col-lg-2 col-md-3 col-sm-12 col-xs-12 pad-bot-10">
-              <button
-                className="btn btn-primary btn-lg"
-                style={{ width: "100%" }}
-                onClick={this.props.searchClick}
-              >
-                Search
-              </button>
-    </span>*/}
+          <div className="form-group row search-tab container search-tab-display-property"></div>
+          <div className="property-listing-content">
+            <ul>{itemDetails}</ul>
+            <ul id="Page Numbers">{renderPageNumbers}</ul>
           </div>
-          <div className="property-listing-content">{itemDetails}</div>
           <div className="container center-content pad-top-20-pc">
             <div>
               Use of this Web site constitutes acceptance of the GrubHub.com

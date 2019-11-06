@@ -4,9 +4,14 @@ import axios from "axios";
 import cookie from "react-cookies";
 import Header from "../Header/Header";
 
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { updateitems } from "../../actions/ItemsActions";
+import { rooturl } from "../../config/settings";
+
 class UpdateItems extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       item_name: "",
@@ -27,7 +32,7 @@ class UpdateItems extends Component {
       item_id: this.props.match.params.id
     };
     console.log("Data Item_ID:", data);
-    axios.post("http://localhost:3001/item-details", data).then(response => {
+    axios.post(`${rooturl}/item-details`, data).then(response => {
       if (response.status === 200) {
         console.log(response.data);
         var data = response.data;
@@ -54,10 +59,6 @@ class UpdateItems extends Component {
     e.preventDefault();
     axios.defaults.withCredentials = true;
 
-    // var data = {
-    //   item_id: this.props.match.params.id
-    // };
-
     const data = {
       item_id: this.props.match.params.id,
       item_name: this.state.item_name,
@@ -68,20 +69,7 @@ class UpdateItems extends Component {
     };
     console.log("Data:", data);
 
-    axios.post("http://localhost:3001/update-item", data).then(response => {
-      console.log("Response Status:", response.status);
-      console.log(response.request.response);
-      if (response.status === 200) {
-        console.log("Item updated successfully");
-        this.setState({
-          isUpdate: true
-        });
-      } else {
-        this.setState({
-          isUpdate: false
-        });
-      }
-    });
+    this.props.updateitems(data);
   };
 
   render() {
@@ -177,4 +165,11 @@ class UpdateItems extends Component {
   }
 }
 
-export default UpdateItems;
+UpdateItems.propTypes = {
+  updateitems: PropTypes.func.isRequired
+};
+
+export default connect(
+  null,
+  { updateitems }
+)(UpdateItems);

@@ -1,85 +1,26 @@
 import React, { Component } from "react";
-//import ReactDOM from "react-router-dom";
-import axios from "axios";
 import cookie, { save } from "react-cookies";
 import { Redirect } from "react-router";
 import Header from "../Header/Header";
-import { Link } from "react-router-dom";
-import DisplayItems from "../DisplayItems/DisplayItems";
-import { isString } from "util";
-import { runInThisContext } from "vm";
 import "bootstrap/dist/css/bootstrap.css";
 
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { restaurantitems } from "../../actions/DashboardActions";
+import { addtocart } from "../../actions/OrderActions";
+
 class RestaurantDisplay extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      items: [],
-      itemDetails: [],
-      errorRedirect: false
-      //isSelected: true
-    };
-
-    this.saveChanges = this.saveChanges.bind(this);
-    //this.handleChange = this.handleChange.bind(this);
-    //this.addToCart = this.addToCart.bind(this);
-  }
-
   componentDidMount() {
-    axios.defaults.withCredentials = true;
-
     var data = {
       res_id: this.props.match.params.id
     };
-    console.log("Data:", data);
-    axios
-      .post("http://localhost:3001/restaurant-display", data)
-      .then(response => {
-        if (response.status === 200) {
-          console.log("All items in restaurant:", response.data);
-          this.setState({
-            items: response.data
-          });
-        }
-      })
-      .catch(err => {
-        if (err) {
-          this.setState({
-            errorRedirect: true
-          });
-        }
-      });
+    this.props.restaurantitems(data);
   }
-
-  // saveChanges = id => e => {
-  //   console.log(id);
-
-  //   const data = { item_id: id };
-  //   //data = data.push(id);
 
   saveChanges = item => e => {
     console.log(item);
-
     const data = item;
-    //}
-
-    axios.defaults.withCredentials = true;
-
-    axios
-      .post("http://localhost:3001/addtocart", data)
-      .then(response => {
-        if (response.status === 200) {
-          console.log(response.data);
-        }
-      })
-      .catch(err => {
-        if (err) {
-          this.setState({
-            errorRedirect: true
-          });
-        }
-      });
+    this.props.addtocart(data);
   };
 
   render() {
@@ -87,11 +28,11 @@ class RestaurantDisplay extends Component {
     if (!cookie.load("cookie")) {
       redirectVar = <Redirect to="/login" />;
     }
-    if (this.state.errorRedirect) {
+    if (this.props.errorRedirect) {
       redirectVar = <Redirect to="/error" />;
     }
-    console.log(this.state.items);
-    let itemDetails = this.state.items.map(function(item, index) {
+
+    let itemDetails = this.props.r_items.map(function(item, index) {
       return (
         <div
           class="card"
@@ -141,4 +82,18 @@ class RestaurantDisplay extends Component {
   }
 }
 
-export default RestaurantDisplay;
+RestaurantDisplay.propTypes = {
+  r_items: PropTypes.array.isRequired,
+  orders: PropTypes.array.isRequired
+};
+
+const mapStateToProps = state => {
+  return {
+    r_items: state.r_items.restaurants
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  { restaurantitems, addtocart }
+)(RestaurantDisplay);

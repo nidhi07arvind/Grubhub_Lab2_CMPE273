@@ -3,6 +3,7 @@ import axios from "axios";
 import cookie from "react-cookies";
 import { Redirect } from "react-router";
 import Header from "../Header/Header";
+import { rooturl } from "../../config/settings";
 
 class Login extends Component {
   constructor() {
@@ -61,7 +62,7 @@ class Login extends Component {
       axios.defaults.withCredentials = true;
 
       axios
-        .post("http://localhost:3001/login", data)
+        .post(`${rooturl}/login`, data)
         .then(response => {
           if (response.status === 200) {
             this.setState({

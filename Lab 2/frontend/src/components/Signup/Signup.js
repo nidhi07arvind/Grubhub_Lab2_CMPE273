@@ -93,7 +93,7 @@ class Signup extends Component {
 
   render() {
     let redirectVar = null;
-    if (this.state.isNewUserCreated === true) {
+    if (this.props.signup.isNewUserCreated === true) {
       redirectVar = <Redirect to="/login" />;
     }
 

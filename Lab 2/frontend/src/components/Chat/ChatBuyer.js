@@ -5,6 +5,7 @@ import Header from "../Header/Header";
 import cookie from "react-cookies";
 import { Link } from "react-router-dom";
 import { Redirect } from "react-router";
+import { rooturl } from "../../config/settings";
 
 class BuyerChat extends Component {
   constructor() {
@@ -22,9 +23,12 @@ class BuyerChat extends Component {
   }
 
   componentDidMount() {
+    var data = {
+      order_id: this.props.match.params.id
+    };
     axios.defaults.withCredentials = true;
     axios
-      .get("http://localhost:3001/get-chats")
+      .post(`${rooturl}/get-chats`, data)
       .then(response => {
         if (response.status === 200) {
           console.log("Response : ", response.data);
@@ -59,7 +63,7 @@ class BuyerChat extends Component {
     axios.defaults.withCredentials = true;
 
     //make a post request with the user data
-    axios.post("http://localhost:3001/send-chat", data).then(response => {
+    axios.post(`${rooturl}/send-chat`, data).then(response => {
       console.log("Status Code : ", response.status);
       console.log(response.request.response);
       if (response.status === 200) {
@@ -89,7 +93,7 @@ class BuyerChat extends Component {
         <div className="container trip-details-container" key={index}>
           <div className="alert alert-primary">
             <div className="trip-main-details blue-text">
-              <div>Buyer Message: {chat}</div>
+              <div>Message: {chat}</div>
               <br></br>
             </div>
           </div>

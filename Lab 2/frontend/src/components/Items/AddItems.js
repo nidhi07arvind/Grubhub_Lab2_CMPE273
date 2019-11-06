@@ -3,6 +3,10 @@ import axios from "axios";
 import ImageUploader from "react-images-upload";
 import Header from "../Header/Header";
 
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { additems } from "../../actions/ItemsActions";
+
 class AddItems extends Component {
   constructor(props) {
     super(props);
@@ -74,9 +78,8 @@ class AddItems extends Component {
       pictures: this.state.pictures.concat(picture)
     });
   }
-  SaveChanges = () => {
-    //var headers = new Headers();
-    //prevent page from refresh
+  SaveChanges = e => {
+    e.preventDefault();
 
     const data = {
       name: this.state.name,
@@ -86,24 +89,8 @@ class AddItems extends Component {
       image: this.state.image,
       cuisine: this.state.cuisine
     };
-    //set the with credentials to true
-    axios.defaults.withCredentials = true;
 
-    //make a post request with the user data
-    axios.post("http://localhost:3001/additem", data).then(response => {
-      console.log("Status Code : ", response.status);
-      console.log(response.request.response);
-      if (response.status === 200) {
-        this.setState({
-          isSave: true
-        });
-        console.log("Item created successfully");
-      } else {
-        this.setState({
-          isSave: false
-        });
-      }
-    });
+    this.props.additems(data);
   };
 
   render() {
@@ -221,4 +208,11 @@ class AddItems extends Component {
   }
 }
 
-export default AddItems;
+AddItems.propTypes = {
+  additems: PropTypes.func.isRequired
+};
+
+export default connect(
+  null,
+  { additems }
+)(AddItems);

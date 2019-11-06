@@ -1,4 +1,11 @@
 export const SIGNUP = "SIGNUP";
 export const GET_PROFILE_DETAILS = "GET_PROFILE_DETAILS";
 export const UPDATE_PROFILE_DETAILS = "UPDATE_PROFILE_DETAILS";
-//export const NEW_POSTS = "NEW_POSTS";
+export const ADD_ITEMS = "ADD_ITEMS";
+export const UPDATE_ITEMS = "UPDATE_ITEMS";
+export const DELETE_ITEMS = "DELETE_ITEMS";
+export const GET_DASHBOARD = "GET_DASHBOARD";
+export const RESTAURANT_ITEMS = "RESTAURANT_ITEMS";
+export const ADD_TO_CART = "ADD_TO_CART";
+export const CART_DETAILS = "CART_DETAILS";
+export const PLACE_ORDER = "PLACE_ORDER";

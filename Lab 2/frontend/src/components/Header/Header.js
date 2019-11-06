@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import cookie from "react-cookies";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
-import { Link } from "react-router-dom";
+import { rooturl } from "../../config/settings";
 
 class Header extends Component {
   constructor() {
@@ -14,7 +14,7 @@ class Header extends Component {
 
   handleLogout = () => {
     axios.defaults.withCredentials = true;
-    axios.post("http://localhost:3001/logout").then(response => {
+    axios.post(`${rooturl}/logout`).then(response => {
       if (response.status === 200) {
         console.log("User logged out!");
       }
@@ -46,7 +46,7 @@ class Header extends Component {
             </a>
           </span>
           <span>
-            <a href="/add-items" className="btn btn-sm lyp-btn">
+            <a href="/get-owner-chats" className="btn btn-sm lyp-btn">
               Chats
             </a>
           </span>
