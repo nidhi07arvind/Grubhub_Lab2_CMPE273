@@ -20,6 +20,9 @@ var cookieParser = require("cookie-parser");
 var cors = require("cors");
 
 var passport = require("passport");
+var jwt = require("jsonwebtoken");
+
+var requireAuth = passport.authenticate("jwt", { session: false });
 
 var mysql = require("mysql");
 var MongoClient = require("mongodb").MongoClient;

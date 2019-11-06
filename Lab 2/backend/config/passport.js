@@ -4,33 +4,21 @@ var ExtractJwt = require("passport-jwt").ExtractJwt;
 const { getConnectionMongo } = require("../dbs/index");
 const secret = "secret";
 
-// Setup work and export for the JWT passport strategy
 module.exports = function(passport) {
   var opts = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("jwt"), //ExtractJwt.fromAuthHeaderAsBearerToken(), //req => req.cookie("owner"), //ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: secret
   };
   passport.use(
     new JwtStrategy(opts, async function(jwt_payload, callback) {
       const { connection, client } = await getConnectionMongo();
 
-      // db.findUser(
-      //   { username: jwt_payload.username },
-      //   function(res) {
-      //     var user = res;
-      //     delete user.password;
-      //     callback(null, user);
-      //   },
-      //   function(err) {
-      //     return callback(err, false);
-      //   }
-      // );
-
       connection
         .collection("owner")
-        .findOne({ name: jwt_payload.name }, (err, res) => {
+        .findOne({ name: jwt_payload.cookie }, (err, res) => {
           if (res) {
             var user = res;
+            console.log("user found passport auth", user);
             delete user.Password;
             callback(null, user);
           } else {

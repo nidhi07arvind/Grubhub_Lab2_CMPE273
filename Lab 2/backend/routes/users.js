@@ -11,14 +11,69 @@ var jwt = require("jsonwebtoken");
 var requireAuth = passport.authenticate("jwt", { session: false });
 const secret = "secret";
 
+//var cfg = require("./config.js");
+
 const uri =
   "mongodb+srv://admin:admin@lab0-stjgi.mongodb.net/test?retryWrites=true&w=majority";
 
-/*app.post("/login", function(req, res) {
+app.post("/login", function(req, res) {
   console.log("Inside login POST");
   console.log("Request Body: ", req.body);
-  //Query
+
   if (req.body.Profile === "Owner") {
+    kafka.make_request("login", req.body, function(err, result) {
+      console.log("in results login");
+      console.log("results", result);
+      if (err) {
+        console.log("Invalid Credentials!!");
+        res.writeHead(400, {
+          "Content-Type": "text/plain"
+        });
+        res.end("Invalid Credentials!!");
+      } else {
+        console.log("inside results login");
+        console.log(result);
+
+        if (result) {
+          console.log(result);
+          req.session.user = result;
+
+          var token = jwt.sign(result, secret, {
+            expiresIn: 10080
+          });
+
+          res.cookie("cookie", result.name, {
+            maxAge: 360000,
+            httpOnly: false,
+            path: "/"
+          });
+
+          res.cookie("owner", 2, {
+            maxAge: 360000,
+            httpOnly: false,
+            path: "/"
+          });
+
+          //localStorage.setItem("local storage", result);
+
+          var Result = {
+            name: result.name,
+            accounttype: result.accounttype,
+            Token: token
+          };
+          res.status(200).send(JSON.stringify(Result));
+          //res.status(200).json({ success: true, token: "JWT" + token });
+          console.log("Result", Result);
+        } else {
+          res.writeHead(401, {
+            "Content-Type": "text/plain"
+          });
+          console.log("Invalid Credentials");
+          res.end("Invalid Credentials");
+        }
+      }
+    });
+  } else if (req.body.Profile === "Buyer") {
     kafka.make_request("login", req.body, function(err, result) {
       console.log("in results login");
       console.log("results", result);
@@ -35,22 +90,30 @@ const uri =
         if (result) {
           console.log(result);
           req.session.user = result;
+          console.log("############");
 
           var token = jwt.sign(result, secret, {
             expiresIn: 10080
           });
-          res.writeHead(200, {
-            "Content-Type": "text/plain"
+
+          res.cookie("cookie", result.name, {
+            maxAge: 360000,
+            httpOnly: false,
+            path: "/"
           });
 
-          //localStorage.setItem("local storage", result);
+          res.cookie("buyer", 1, {
+            maxAge: 360000,
+            httpOnly: false,
+            path: "/"
+          });
 
           var Result = {
             name: result.name,
             accounttype: result.accounttype,
             Token: token
           };
-          res.end(JSON.stringify(Result));
+          res.status(200).send(JSON.stringify(Result));
           console.log("Result", Result);
         } else {
           res.writeHead(401, {
@@ -62,7 +125,7 @@ const uri =
       }
     });
   }
-});*/
+});
 //////////////////////////////////do not use///////////////////
 /*var collection = client.db("grubhub").collection("buyer");
     var query = { email: req.body.Email };
@@ -116,7 +179,7 @@ const uri =
   }
 });*/
 
-app.post("/login", function(req, res) {
+/*app.post("/login", function(req, res) {
   console.log("Inside login POST");
   console.log("Request Body: ", req.body);
   //Query
@@ -219,7 +282,7 @@ app.post("/login", function(req, res) {
       }
     });
   }
-});
+});*/
 
 app.post("/signup", function(req, res) {
   console.log("Inside Signup POST");
@@ -244,46 +307,6 @@ app.post("/signup", function(req, res) {
   });
 });
 
-/*app.post("/signup", function(req, res) {
-  console.log("Inside Signup POST");
-  console.log("Request Body: ", req.body);
-
-  MongoClient.connect(uri, { useUnifiedTopology: true }, function(err, client) {
-    if (err) {
-      console.log("Error occurred while connecting to MongoDB Atlas...\n", err);
-    } else {
-      console.log("Connected...Success");
-      const collection = client.db("grubhub").collection("buyer");
-      const hashedPassword = bcrypt.hashSync(req.body.Password, 10);
-
-      var buyer = {
-        name: req.body.FirstName,
-        email: req.body.Email,
-        password: hashedPassword,
-        accounttype: req.body.Accounttype
-      };
-
-      collection.insertOne(buyer, function(err, result) {
-        if (err) {
-          console.log("Error in adding User");
-          res.writeHead(400, {
-            "Content-Type": "text/plain"
-          });
-          res.end("Error in adding User");
-        } else {
-          console.log("Adding a user successful!");
-          res.writeHead(200, {
-            "Content-type": "text/plain"
-          });
-          res.end("Adding a user successful!");
-        }
-      });
-
-      client.close();
-    }
-  });
-});*/
-
 app.post("/ownersignup", function(req, res) {
   console.log("Inside Owner Signup POST");
   console.log("Request Body: ", req.body);
@@ -307,84 +330,7 @@ app.post("/ownersignup", function(req, res) {
   });
 });
 
-/*app.post("/ownersignup", function(req, res) {
-  console.log("Inside Owner Signup POST");
-  console.log("Request Body: ", req.body);
-
-  //User creation query
-
-  var res_id = Math.floor(Math.random() * 100);
-  var res_name = req.body.RestaurantName;
-  console.log(res_id);
-
-  MongoClient.connect(uri, { useUnifiedTopology: true }, function(err, client) {
-    if (err) {
-      console.log("Error occurred while connecting to MongoDB Atlas...\n", err);
-    } else {
-      console.log("Connected to DB Successfully");
-
-      const collection = client.db("grubhub").collection("restaurant");
-
-      var restaurant = {
-        res_id: res_id,
-        res_name: req.body.RestaurantName,
-        zipcode: req.body.ZipCode
-      };
-
-      collection.insertOne(restaurant, function(err, result) {
-        if (err) {
-          console.log("Error in adding restaurant");
-        } else {
-          console.log("Added restaurant successfully");
-        }
-      });
-
-      client.close();
-    }
-  });
-
-  MongoClient.connect(uri, { useUnifiedTopology: true }, function(err, client) {
-    if (err) {
-      console.log("Error occurred while connecting to MongoDB Atlas...\n", err);
-    } else {
-      console.log("Connected to DB successfully");
-
-      const collection = client.db("grubhub").collection("owner");
-
-      var owner_id = Math.floor(Math.random() * 1000);
-      const hashedPassword = bcrypt.hashSync(req.body.Password, 10);
-
-      var owner = {
-        name: req.body.FirstName,
-        owner_id: owner_id,
-        res_id: res_id,
-        email: req.body.Email,
-        password: hashedPassword,
-        accounttype: req.body.Accounttype,
-        res_name: res_name
-      };
-
-      collection.insertOne(owner, function(err, result) {
-        if (err) {
-          console.log("Error in adding owner");
-          res.writeHead(400, {
-            "Content-Type": "text/plain"
-          });
-          res.end("Error in adding Owner");
-        } else {
-          console.log("Adding a owner successful!");
-          res.writeHead(200, {
-            "Content-type": "text/plain"
-          });
-          res.end("Adding a user successful!");
-        }
-      });
-      client.close();
-    }
-  });
-});*/
-
-app.get("/profile-details", function(req, res) {
+app.get("/profile-details", requireAuth, function(req, res) {
   console.log("Inside profile GET");
   console.log("Request Body:", req.body);
   var key1 = "accounttype";

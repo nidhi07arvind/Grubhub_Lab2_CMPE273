@@ -1,16 +1,11 @@
 const express = require("express");
-const pool = require("../ConnectionPooling");
-var mysql = require("mysql");
-var MongoClient = require("mongodb").MongoClient;
 const app = express.Router();
 var bcrypt = require("bcrypt");
 
 var kafka = require("../kafka/client");
 
-const { getConnectionMongo } = require("../dbs/index");
-
-const uri =
-  "mongodb+srv://admin:admin@lab0-stjgi.mongodb.net/test?retryWrites=true&w=majority";
+var passport = require("passport");
+var requireAuth = passport.authenticate("jwt", { session: false });
 
 app.post("/additem", function(req, res) {
   console.log("Inside AddItems POST");
@@ -20,28 +15,12 @@ app.post("/additem", function(req, res) {
 
   var key1 = "res_id";
   var value1 = req.session.user.res_id;
-
   var key2 = "res_name";
   var value2 = req.session.user.res_name;
-
-  //var res_name = req.session.user.res_name;
-
   req.body[key1] = value1;
   req.body[key2] = value2;
 
   console.log("new Request Body: ", req.body);
-
-  // new_req = {
-  //   res_id : req.session.user.res_id,
-  //   res_name : req.session.user.res_name,
-  //   name : req.body.name,
-  //   description: req.body.description,
-  //   section : req.body.section,
-  //   price : req.body.price,
-  //   image : req.body.image,
-  //   cuisine : req.body.
-  // }
-  //var res_id;
 
   if (req.session.user) {
     kafka.make_request("additem", req.body, function(err, results) {
@@ -64,104 +43,6 @@ app.post("/additem", function(req, res) {
   }
 });
 
-/*app.post("/additem", function(req, res) {
-  console.log("Inside AddItems POST");
-  console.log("Request Body: ", req.body);
-
-  console.log(req.session.user);
-  //var res_id;
-
-  if (req.session.user) {
-    var res_id = req.session.user.res_id;
-    var res_name = req.session.user.res_name;
-
-    MongoClient.connect(uri, { useUnifiedTopology: true }, function(
-      err,
-      client
-    ) {
-      if (err) {
-        console.log(
-          "Error occurred while connecting to MongoDB Atlas...\n",
-          err
-        );
-      } else {
-        console.log("Connected to DB Success");
-
-        /*var collection = client.db("grubhub").collection("owner");
-        var query = { email: req.session.user.email };
-        console.log(query);
-
-        collection.find(query).toArray(function(err, result) {
-          if (err) {
-            console.log("Invalid Credentials!!");
-          } else {
-            console.log(result);
-            console.log("ResID", result[0].res_id);
-            var res_id = result[0].res_id;
-            console.log("Assigned to variable ResID", res_id);
-          }
-        });
-
-        console.log("Res ID final:", res_id);
-
-        client.close();
-      }
-    });
-
-    MongoClient.connect(uri, { useUnifiedTopology: true }, function(
-      err,
-      client
-    ) {
-      if (err) {
-        console.log(
-          "Error occurred while connecting to MongoDB Atlas...\n",
-          err
-        );
-      } else {
-        console.log("Connected to DB Success");
-        console.log("Res ID final 2:", res_id);*/
-
-/*var collection = client.db("grubhub").collection("item");
-
-        const item_id = Math.floor(Math.random() * 1000);
-
-        console.log("Item ID final:", item_id);
-
-        var item = {
-          res_id: res_id,
-          res_name: res_name,
-          item_id: item_id,
-          item_name: req.body.name,
-          description: req.body.description,
-          price: req.body.price,
-          cuisine: req.body.cuisine,
-          section: req.body.section,
-          image: req.body.image
-        };
-
-        console.log("item", item);
-
-        collection.insertOne(item, function(err, result) {
-          if (err) {
-            res.writeHead(400, {
-              "Content-Type": "text/plain"
-            });
-            console.log("Error in adding items");
-            res.end("Error in adding items");
-          } else {
-            console.log("Item added successfully");
-            // res.writeHead(200, {
-            //   "Content-type": "text/plain"
-            // });
-            res.end("Item added successfully!");
-          }
-        });
-
-        client.close();
-      }
-    });
-  }
-})*/
 app.get("/owner-dashboard-details", async function(req, res) {
   console.log("Inside Owner Dashboard Details GET!");
   const userSession = req.session.user;
@@ -192,34 +73,6 @@ app.get("/owner-dashboard-details", async function(req, res) {
   }
 });
 
-app.get("/owner-dashboard-details", async function(req, res) {
-  console.log("Inside Owner Dashboard Details GET!");
-  const userSession = req.session.user;
-
-  if (req.session.user) {
-    var res_id = req.session.user.res_id;
-
-    const { connection, client } = await getConnectionMongo();
-
-    connection
-      .collection("item")
-      .find({ res_id: res_id })
-      .toArray(function(err, result) {
-        if (err) console.log("Error in fetching profile details");
-        else {
-          console.log("inside new");
-          console.log("Items in Dashboard loaded successfully");
-          console.log(result);
-
-          console.log(JSON.stringify(result));
-          res.status(200).send(JSON.stringify(result));
-        }
-      });
-
-    client.close();
-  }
-});
-
 app.post("/delete-item", function(req, res) {
   console.log("Inside delete item from menu POST");
   console.log("Request Body: ", req.body);
@@ -245,47 +98,6 @@ app.post("/delete-item", function(req, res) {
     });
   }
 });
-
-/*app.post("/delete-item", function(req, res) {
-  console.log("Inside delete item from menu POST");
-  console.log("Request Body: ", req.body);
-  const userSession = req.session.user;
-
-  if (req.session.user) {
-    MongoClient.connect(uri, { useUnifiedTopology: true }, function(
-      err,
-      client
-    ) {
-      if (err) {
-        console.log(
-          "Error occurred while connecting to MongoDB Atlas...\n",
-          err
-        );
-      } else {
-        console.log("Connected to DB Success");
-
-        var collection = client.db("grubhub").collection("item");
-        var query = {
-          item_id: req.body.item_id
-        };
-
-        collection.deleteMany(query, function(err, result) {
-          if (err) {
-            console.log("Error in deleting items");
-          } else {
-            console.log("Deleted item successful!");
-            res.writeHead(200, {
-              "Content-type": "text/plain"
-            });
-            res.end("Deleted item successful!");
-          }
-        });
-        client.close();
-      }
-    });
-  }
-});
-*/
 
 /*app.get("/breakfast-details", function(req, res) {
   console.log("Inside Breakfast Details GET!");
@@ -556,51 +368,6 @@ app.post("/item-details", function(req, res) {
   }
 });
 
-/*app.post("/item-details", function(req, res) {
-  console.log("Inside item details POST");
-  console.log("Request Body:", req.body);
-  const userSession = req.session.user;
-  const item_num = parseInt(req.body.item_id);
-  console.log(item_num);
-
-  if (req.session.user) {
-
-    
-    MongoClient.connect(uri, { useUnifiedTopology: true }, function(
-      err,
-      client
-    ) {
-      if (err) {
-        console.log(
-          "Error occurred while connecting to MongoDB Atlas...\n",
-          err
-        );
-      } else {
-        console.log("Connected to DB Successfully");
-
-        var collection = client.db("grubhub").collection("item");
-        var query = { item_id: item_num };
-        console.log("Query:", query);
-
-        collection.find(query).toArray(function(err, result) {
-          if (err) console.log("Error in fetching profile details");
-          else {
-            console.log("Item Data loaded successfully");
-            console.log(result);
-            res.writeHead(200, {
-              "Content-type": "application/json"
-            });
-            res.end(JSON.stringify(result[0]));
-            console.log(JSON.stringify(result));
-          }
-        });
-
-        client.close();
-      }
-    });
-  }
-});*/
-
 app.post("/update-item", function(req, res) {
   console.log("Inside UPDATE ITEM POST");
   console.log("Request Body:", req.body);
@@ -628,58 +395,6 @@ app.post("/update-item", function(req, res) {
     });
   }
 });
-
-/*app.post("/update-item", function(req, res) {
-  console.log("Inside UPDATE ITEM POST");
-  console.log("Request Body:", req.body);
-  const userSession = req.session.user;
-  const item_num = parseInt(req.body.item_id);
-  console.log(item_num);
-
-  if (req.session.user) {
-    MongoClient.connect(uri, { useUnifiedTopology: true }, function(
-      err,
-      client
-    ) {
-      if (err) {
-        console.log(
-          "Error occurred while connecting to MongoDB Atlas...\n",
-          err
-        );
-      } else {
-        console.log("Connected to DB Success");
-        var collection = client.db("grubhub").collection("item");
-        var query = {
-          item_id: item_num
-        };
-        console.log("Query", query);
-
-        var newitem = {
-          $set: {
-            item_name: req.body.item_name,
-            description: req.body.description,
-            price: req.body.price
-            //section: req.body.section,
-            // image: req.body.image
-          }
-        };
-
-        collection.updateOne(query, newitem, function(err, result) {
-          if (err) {
-            console.log("Error in updating profile");
-          } else {
-            console.log("Updating item successful!");
-            res.writeHead(200, {
-              "Content-type": "text/plain"
-            });
-            res.end("Updating item successful!");
-          }
-        });
-        client.close();
-      }
-    });
-  }
-});*/
 
 app.get("/owner-order-details", function(req, res) {
   console.log("Inside Owner Order Details GET!");
@@ -709,41 +424,6 @@ app.get("/owner-order-details", function(req, res) {
     });
   }
 });
-
-/*
-
-  if (req.session.user) {
-    MongoClient.connect(uri, { useUnifiedTopology: true }, function(
-      err,
-      client
-    ) {
-      if (err) {
-        console.log(
-          "Error occurred while connecting to MongoDB Atlas...\n",
-          err
-        );
-      } else {
-        console.log("Connected to DB Success");
-        var collection = client.db("grubhub").collection("orders");
-        var query = { res_id: req.session.user.res_id };
-
-        collection.find(query).toArray(function(err, result) {
-          if (err) {
-            console.log("Error in fetching profile details");
-          } else {
-            console.log("Items in Dashboard loaded successfully");
-            console.log(result);
-
-            console.log(JSON.stringify(result));
-            res.status(200).send(JSON.stringify(result));
-          }
-        });
-
-        client.close();
-      }
-    });
-  }
-});*/
 
 /*app.post("/send-chat", async function(req, res) {
   console.log("Inside Buyer nids Chats POST!");

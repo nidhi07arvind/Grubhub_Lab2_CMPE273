@@ -1,9 +1,6 @@
 var MongoClient = require("mongodb").MongoClient;
 var db = {};
 
-// const uri =
-//   "mongodb+srv://admin:admin@lab0-stjgi.mongodb.net/test?retryWrites=true&w=majority";
-
 const getConnectionMongo = () => {
   return new Promise((resolve, reject) => {
     const uri =
@@ -19,17 +16,7 @@ const getConnectionMongo = () => {
   });
 };
 
-// MongoClient.connect(uri, { useUnifiedTopology: true }, function(err, client) {
-//   if (err) {
-//     console.log("Error occurred while connecting to MongoDB Atlas...\n", err);
-//   } else {
-//     console.log("Connected to DB Success");
-
-//     //return client;
-//   }
-// });
-
-db.findUser = function(user, successCallback, failureCallback) {
+/*db.findUser = function(user, successCallback, failureCallback) {
   var collection = client.db("grubhub").collection("buyer");
   var query = { name: user.name };
 
@@ -41,7 +28,7 @@ db.findUser = function(user, successCallback, failureCallback) {
       successCallback(result[0]);
     }
   });
-};
+};*/
 
 module.exports = { getConnectionMongo };
 module.exports = db;
