@@ -12,12 +12,6 @@ async function handle_request(message, callback) {
     .toArray(function(err, result) {
       if (err) callback(err, "Error");
       else {
-        // console.log("inside new");
-        // console.log("Items in Dashboard loaded successfully");
-        // console.log(result);
-
-        // console.log(JSON.stringify(result));
-        // res.status(200).send(JSON.stringify(result));
         callback(null, result);
       }
     });

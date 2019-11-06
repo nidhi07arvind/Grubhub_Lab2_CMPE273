@@ -1,40 +1,30 @@
-//var bcrypt = require("bcrypt-nodejs");
+const { getConnectionMongo } = require("../dbs/index");
 var bcrypt = require("bcrypt");
-var MongoClient = require("mongodb").MongoClient;
 
-const uri =
-  "mongodb+srv://admin:admin@lab0-stjgi.mongodb.net/test?retryWrites=true&w=majority";
-
-function handle_request(message, callback) {
+async function handle_request(message, callback) {
   console.log("Inside Kafka Backend Signup");
   console.log("Message: ", message);
 
-  MongoClient.connect(uri, { useUnifiedTopology: true }, function(err, client) {
+  const { connection, client } = await getConnectionMongo();
+
+  const hashedPassword = bcrypt.hashSync(message.Password, 10);
+
+  var buyer = {
+    name: message.FirstName,
+    email: message.Email,
+    password: hashedPassword,
+    accounttype: message.Accounttype
+  };
+
+  connection.collection("buyer").insertOne(buyer, function(err, result) {
     if (err) {
-      console.log("Error occurred while connecting to MongoDB Atlas...\n", err);
+      callback(err, "Error");
     } else {
-      console.log("Connected...Success");
-      const collection = client.db("grubhub").collection("buyer");
-      const hashedPassword = bcrypt.hashSync(message.Password, 10);
-
-      var buyer = {
-        name: message.FirstName,
-        email: message.Email,
-        password: hashedPassword,
-        accounttype: message.Accounttype
-      };
-
-      collection.insertOne(buyer, function(err, result) {
-        if (err) {
-          callback(err, "Error");
-        } else {
-          callback(null, []);
-        }
-      });
-
-      client.close();
+      callback(null, []);
     }
   });
+
+  client.close();
 }
 
 exports.handle_request = handle_request;

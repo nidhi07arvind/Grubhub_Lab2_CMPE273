@@ -13,9 +13,9 @@ async function handle_request(message, callback) {
     $set: {
       item_name: message.item_name,
       description: message.description,
-      price: message.price
-      //section: req.body.section,
-      // image: req.body.image
+      price: message.price,
+      section: message.section,
+      image: message.image
     }
   };
 

@@ -1,5 +1,4 @@
 const { getConnectionMongo } = require("../dbs/index");
-//var regex = require("regex");
 
 async function handle_request(message, callback) {
   console.log("Inside Kafka Backend Restaurant Details");

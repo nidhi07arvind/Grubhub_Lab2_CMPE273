@@ -6,16 +6,18 @@ async function handle_request(message, callback) {
 
   const { connection, client } = await getConnectionMongo();
 
-  const new_msg = {
-    buyer_msg: message.type_message
-  };
+  if (message.accounttype === 1) {
+    const new_msg = {
+      buyer_msg: message.type_message
+    };
 
-  console.log("new msg:", new_msg);
+    console.log("new msg:", new_msg);
 
-  connection
-    .collection("orders")
-    .updateOne(
-      { email: message.email, status: { $ne: "complete" } },
+    connection.collection("orders").updateOne(
+      {
+        email: message.email /*{ res_id: message.res_id}*/,
+        status: { $ne: "complete" }
+      },
       { $push: { "chats.buyer_msg.bm": message.type_message } },
       function(err, result) {
         if (err) {
@@ -30,6 +32,33 @@ async function handle_request(message, callback) {
         }
       }
     );
+  } else {
+    const new_msg = {
+      buyer_msg: message.type_message
+    };
+
+    console.log("new msg:", new_msg);
+
+    connection.collection("orders").updateOne(
+      {
+        res_id: message.res_id,
+        status: { $ne: "complete" }
+      },
+      { $push: { "chats.buyer_msg.bm": message.type_message } },
+      function(err, result) {
+        if (err) {
+          callback(err, "Error");
+        } else {
+          // console.log("inside kafka query", result);
+          // result.chats = result.chats || [];
+          // result.chats.push(new_msg);
+          // console.log("inside kafka query pushed", result);
+
+          callback(null, result);
+        }
+      }
+    );
+  }
 
   client.close();
 }

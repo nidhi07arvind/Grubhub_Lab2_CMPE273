@@ -24,9 +24,12 @@ async function handle_request(message, callback) {
     items: items,
     status: "new",
     chats: {
-      owner_msg: "",
-      buyer_msg: "",
-      isowner: false
+      buyer_msg: {
+        bm: []
+      },
+      owner_msg: {
+        om: []
+      }
     }
   };
   console.log("Order", order);

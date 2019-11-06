@@ -10,12 +10,6 @@ async function handle_request(message, callback) {
   console.log("searchProperties.searchText", searchProperties.searchText);
 
   const { connection, client } = await getConnectionMongo();
-  //User.find(username: {$regex: "/^" + req.params.data + "/"});
-
-  //   connection
-  //     .collection("item")
-  //     .find({ item_name: { $regex: "/^" + searchProperties.searchText + "/" } })
-  //     .toArray
   connection
     .collection("item")
     .find({ item_name: searchProperties.searchText })
